@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 const dburl = `mongodb://localhost/sogou`;
-mongoose.connect(dburl);
+// mongoose.connect(dburl);
 
 const weixinhost = `mp.weixin.qq.com`;
 const sogouhost = `weixin.sogou.com`;
