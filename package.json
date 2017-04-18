@@ -1,0 +1,25 @@
+{
+  "name": "sogou",
+  "version": "1.0.0",
+  "description": "sougou crawl weixin",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "sougou",
+    "weixin"
+  ],
+  "author": "soonfy <soonfy@163.com> (https://github.com/soonfy)",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/cheerio": "^0.22.1",
+    "@types/mongoose": "^4.7.10",
+    "@types/node": "^7.0.12",
+    "@types/request-promise": "^4.1.33",
+    "cheerio": "^0.22.0",
+    "mongoose": "^4.9.5",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.0"
+  }
+}
