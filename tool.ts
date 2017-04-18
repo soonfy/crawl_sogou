@@ -70,7 +70,7 @@ const changeip = async () => {
     child_process.execSync(`echo ${password} | sudo -S ip route add default dev ${ppp} table weibo`);
     clog(`auto pppoe success.`);
   } catch (error) {
-    await handler(error));
+    await handler(error);
     await changeip();
   }
 }
