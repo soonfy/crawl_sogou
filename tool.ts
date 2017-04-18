@@ -32,9 +32,9 @@ const handler = async (error) => {
 
 const insertdb = async (model, obj) => {
   try {
-    let weixiner = await model.findOneAndUpdate({ _id: obj._id }, { $set: obj }, { upsert: true, new: true });
-    clog(weixiner._id);
-    return weixiner;
+    // let weixiner = await model.findOneAndUpdate({ _id: obj._id }, { $set: obj }, { upsert: true, new: true });
+    // clog(weixiner._id);
+    // return weixiner;
   } catch (error) {
     await handler(error);
     return await insertdb(model, obj);
