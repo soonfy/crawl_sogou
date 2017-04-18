@@ -11,6 +11,10 @@
     "weixin"
   ],
   "author": "soonfy <soonfy@163.com> (https://github.com/soonfy)",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:soonfy/soonfy_sogou.git"
+  },
   "license": "MIT",
   "devDependencies": {
     "@types/cheerio": "^0.22.1",
