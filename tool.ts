@@ -53,7 +53,6 @@ const changeip = async () => {
     clog(`start auto pppoe.`)
     child_process.execSync(`echo ${password} | sudo -S poff dsl1`);
     clog(`poff dsl1 success. wait 1m to pon dsl1.`)
-    clog(`match ${ppp}.`)
     await sleep(60);
     child_process.execSync(`echo ${password} | sudo -S pon dsl1`);
     clog(`pon dsl1 success.`)
