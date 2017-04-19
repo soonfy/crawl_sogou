@@ -322,14 +322,14 @@ const start = async (id, weixin) => {
         tool.clog(`文章涉嫌违规已被删除。`);
         continue;
       }
-      let commentid = cdata.comment_id;
+      let nonce = cdata.csp_nonce_str;
       let text = cdata.content_noencode.replace(/<\/?[^>]*>/g, '').replace(/&nbsp;/ig, '');
-      let _id = [username, commentid].join('');
+      let _id = [username, nonce].join('');
       let content: Content = {
         _id: _id,
         username,
         nonce: cdata.csp_nonce_str,
-        commentid,
+        commentid: cdata.comment_id,
         contenturl: jsonurl,
         sourceurl,
         biz: cdata.bizuin,
