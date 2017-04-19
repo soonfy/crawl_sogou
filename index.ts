@@ -29,6 +29,7 @@ interface Content {
   _id: string,
   username: string,
   commentid: number,
+  contenturl: string,
   sourceurl: string,
   biz: string,
   title: string,
@@ -297,7 +298,6 @@ const start = async (id, weixin) => {
       }
 
       temp = temp.replace(/amp;/g, '');
-      temp = temp.replace(/https?\:\/\/mp\.weixin\.qq\.com/, ''); // 截取掉部分带前缀的链接
       let jsonurl = `${config.preContent}${temp}`;
       let _content = {
         username: username,
@@ -322,6 +322,7 @@ const start = async (id, weixin) => {
         _id: _id,
         username,
         commentid,
+        contenturl: jsonurl,
         sourceurl,
         biz: cdata.bizuin,
         title: cdata.title,

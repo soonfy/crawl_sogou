@@ -8,11 +8,14 @@ const ContentSchema = new Schema({
     type: String,
     unique: true
   },
-  userid: {
+  username: {
     type: String,
   },
   commentid: {
     type: Number,
+  },
+  contenturl: {
+    type: String,
   },
   sourceurl: {
     type: String,
