@@ -290,6 +290,7 @@ const start = async (id, weixin) => {
       // content 采集
       let temp = `${item.content_url.slice(0, -1)}${config.suf}`,
         sourceurl = item.source_url;
+      temp = temp.replace(/amp;/g, '');
       
       // 部分链接没有阅读量接口提取不到阅读量，跳过
       // https://mp.weixin.qq.com/s?__biz=MjM5NzcxNzEyMA==&mid=2649675104&idx=3&sn=3638a6f427178805010b3eb5187139f5&chksm=becfc08f89b84999b31fef2cd28e7b4e1ac8e79a281300590dbdaae8f8ba12a705d590675e88&scene=27#wechat_redirect
@@ -299,7 +300,6 @@ const start = async (id, weixin) => {
         continue;
       }
 
-      temp = temp.replace(/amp;/g, '');
       let jsonurl = `${config.preContent}${temp}`;
       let _content = {
         username: username,
@@ -318,6 +318,7 @@ const start = async (id, weixin) => {
       cdata = JSON.parse(cdata);
       tool.clog(cdata.title);
       if (!cdata.title) {
+        tool.clog(temp);
         tool.clog(`文章涉嫌违规已被删除。`);
         continue;
       }
