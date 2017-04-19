@@ -68,13 +68,13 @@ const search = async (weixin) => {
     // 被封, html 写入文件
     if (!tool.check(body)) {
       await tool.handler(new Error('搜狗搜索被封。'));
-      fs.writeFile(`./logs/error-${weixin}.html`, body, (error) => {
-        if (error) {
-          tool.cerror(error);
-        } else {
-          tool.clog(`html to file success.`);
-        }
-      });
+      // fs.writeFile(`./logs/error-${weixin}.html`, body, (error) => {
+      //   if (error) {
+      //     tool.cerror(error);
+      //   } else {
+      //     tool.clog(`html to file success.`);
+      //   }
+      // });
       await tool.changeip();
       return data = null;
     }
@@ -139,13 +139,13 @@ const getContentList = async (user: User) => {
     // 被封, html 写入文件
     if (!tool.check(body)) {
       await tool.handler(new Error('微信文章列表被封。'));
-      fs.writeFile(`./logs/error-${username}-list.html`, body, (error) => {
-        if (error) {
-          tool.cerror(error);
-        } else {
-          tool.clog(`html to file success.`);
-        }
-      });
+      // fs.writeFile(`./logs/error-${username}-list.html`, body, (error) => {
+      //   if (error) {
+      //     tool.cerror(error);
+      //   } else {
+      //     tool.clog(`html to file success.`);
+      //   }
+      // });
       await tool.changeip();
       return data = null;
     }

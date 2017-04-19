@@ -22,11 +22,11 @@ const handler = async (error) => {
   let time = 10;
   // cerror(error);
   cerror(error.message);
-  fs.appendFile('./logs/error.log', JSON.stringify(error, null, 2), () => {
-    if (error) {
-      cerror(error);
-    }
-  })
+  // fs.appendFile('./logs/error.log', JSON.stringify(error, null, 2), () => {
+  //   if (error) {
+  //     cerror(error);
+  //   }
+  // })
   cerror(`sleep ${time}s`);
   await sleep(time);
 }
