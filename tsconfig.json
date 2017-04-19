@@ -14,7 +14,7 @@
     "listFiles": true,  //是否列出编译源文件
     "listEmittedFiles": true, //是否列出编译后文件
     "moduleResolution": "node", //模块编译规则
-    "outDir": "./main", //编译文件路径
+    "outDir": "./app", //编译文件路径
     "pretty": true, //显示提示与错误
     "removeComments": true, //移除注释
     "jsx": "preserve" //.tsx支持的.jsx

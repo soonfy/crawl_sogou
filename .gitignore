@@ -1,6 +1,7 @@
 /node_modules/
 
 /main/
+/app/
 /typings/
 
 /logs/

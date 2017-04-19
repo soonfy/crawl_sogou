@@ -1,6 +1,16 @@
 import * as mongoose from 'mongoose';
-const dburl = `mongodb://localhost/sogou`;
-// mongoose.connect(dburl);
+// const dburl = `mongodb://localhost/sogou`;
+const dburl = process.argv[2] || `mongodb://localhost/sogou`;
+mongoose.connect(dburl);
+const connection = mongoose.connection;
+connection.on('connected', () => {
+  console.log(`conected dburl ${dburl}`);
+  console.log(`conected db ${connection.db.databaseName}`);
+  let collections = connection.collections;
+  for (let coll in collections) {
+    console.log(`conected collection ${coll}`);
+  }
+})
 
 const weixinhost = `mp.weixin.qq.com`;
 const sogouhost = `weixin.sogou.com`;
@@ -21,6 +31,7 @@ const options = {
 
 
 export {
+  dburl,
   weixinhost,
   sogouhost,
   suf,

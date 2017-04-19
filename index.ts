@@ -10,8 +10,8 @@ import { Weixiner } from './models/weixiner';
 import { Content } from './models/content';
 
 interface User {
-  userid: string,
   username: string,
+  usercn: string,
   userurl: string
 }
 
@@ -27,7 +27,7 @@ interface ContentList {
 
 interface Content {
   _id: string,
-  userid: string,
+  username: string,
   commentid: number,
   sourceurl: string,
   biz: string,
@@ -43,15 +43,19 @@ interface Content {
 /**
  *  搜索框查找微信号
  */
-const search = async (weixin = 'rmrbwx') => {
+const search = async (weixin) => {
   try {
-    let url = weixin.includes(`weixin.sogou.com`) ? weixin : `http://weixin.sogou.com/weixin?type=1&query=${weixin}&ie=utf8&s_from=input&_sug_=y&_sug_type_=`;
+    let url = weixin.includes(`weixin.sogou.com`) ? weixin : weixin ? `http://weixin.sogou.com/weixin?type=1&query=${weixin}&ie=utf8&s_from=input&_sug_=y&_sug_type_=` : weixin;
     tool.clog(`now crawl ${url}`);
+    if (!url) {
+      tool.cerror(`search 链接参数是null`);
+      return null;
+    }
 
     let data: Result = {
       user: {
-        userid: '',
         username: '',
+        usercn: '',
         userurl: '',
       },
       users: []
@@ -61,32 +65,37 @@ const search = async (weixin = 'rmrbwx') => {
     config.options.headers['Host'] = config.sogouhost;
     let body = await rp(config.options);
 
-    // html 写入文件
-    // fs.writeFile(`./logs/${weixin}.html`, body, (error) => {
-    //   if (error) {
-    //     tool.cerror(error);
-    //   } else {
-    //     tool.clog(`html to file success.`);
-    //   }
-    // });
+    // 被封, html 写入文件
+    if (!tool.check(body)) {
+      await tool.handler(new Error('搜狗搜索被封。'));
+      fs.writeFile(`./logs/error-${weixin}.html`, body, (error) => {
+        if (error) {
+          tool.cerror(error);
+        } else {
+          tool.clog(`html to file success.`);
+        }
+      });
+      await tool.changeip();
+      return data = null;
+    }
 
     let $ = cheerio.load(body);
     let divs = $('div.txt-box');
     divs.map((i, e) => {
-      let user = $(e).find('.tit').children('a').text().trim();
+      let usercn = $(e).find('.tit').children('a').text().trim();
       let userurl = $(e).find('.tit').children('a').attr('href');
       let username = $(e).find('.info').children('label').text().trim();
       let _user = {
-        _id: username,
-        user,
+        username,
+        usercn,
         userurl,
         updated: new Date
       };
       data.users.push(_user);
       if (username === weixin) {
         data.user = {
-          userid: username,
-          username: user,
+          username,
+          usercn,
           userurl,
         };
       }
@@ -103,13 +112,18 @@ const search = async (weixin = 'rmrbwx') => {
  */
 const getContentList = async (user: User) => {
   try {
-    let userurl;
+    let username,
+      userurl;
     if (typeof user === 'string') {
-      userurl = user;
+      username = userurl = user;
     } else {
-      ({ userurl } = user);
+      ({ username, userurl } = user);
     }
     tool.clog(`now crawl ${userurl}`);
+    if (!userurl) {
+      tool.cerror(`get content list 链接参数是null`);
+      return null;
+    }
 
     let data: ContentList = {
       biz: '',
@@ -122,14 +136,19 @@ const getContentList = async (user: User) => {
     config.options.headers['Host'] = config.weixinhost;
     let body = await rp(config.options);
 
-    // html 写入文件
-    // fs.writeFile(`./logs/rmrbwx-list.html`, body, (error) => {
-    //   if (error) {
-    //     tool.cerror(error);
-    //   } else {
-    //     tool.clog(`html to file success.`);
-    //   }
-    // });
+    // 被封, html 写入文件
+    if (!tool.check(body)) {
+      await tool.handler(new Error('微信文章列表被封。'));
+      fs.writeFile(`./logs/error-${username}-list.html`, body, (error) => {
+        if (error) {
+          tool.cerror(error);
+        } else {
+          tool.clog(`html to file success.`);
+        }
+      });
+      await tool.changeip();
+      return data = null;
+    }
 
     let $ = cheerio.load(body);
     let scripts = $('script');
@@ -167,6 +186,10 @@ const getContent = async (_content) => {
     }
     jsonurl = jsonurl.replace(/amp;/g, '');
     tool.clog(`now crawl ${jsonurl}`);
+    if (!jsonurl) {
+      tool.cerror(`get content 链接参数是null`);
+      return '';
+    }
 
     config.options.url = jsonurl;
     config.options.headers['Host'] = config.weixinhost;
@@ -185,6 +208,10 @@ const getRead = async (url) => {
   try {
     url = url.replace(/amp;/g, '');
     tool.clog(`now crawl ${url}`);
+    if (!url) {
+      tool.cerror(`get read 链接参数是null`);
+      return '';
+    }
 
     config.options.url = url;
     config.options.headers['Host'] = config.weixinhost;
@@ -205,49 +232,75 @@ const parseList = (contentList) => {
       Array.prototype.push.apply(list, subList);
     }
   })
+  list = list.filter(x => x.content_url);
   return list;
 }
 
-const start = async (weixin = 'rmrbwx') => {
+const start = async (id, weixin) => {
   try {
+    let status = true;
     let udata = await search(weixin);
+    if (!udata) {
+      tool.cerror(`搜狗搜索被封。已自动重新拨号。`);
+      return status = false;
+    }
     let {user, users} = udata;
-    if(users.length === 0){
-      await tool.handler(new Error('搜狗搜索被封。'));
-      return;
-    }
-    let {userid} = user;
     // users 存入数据库
-    let promises = users.map(async (_user) => {
-      return await tool.insertdb(Weixiner, _user);
-    })
-    await Promise.all(promises);
+    // let promises = users.map(async (_user) => {
+    //   _user._id = id;
+    //   return await tool.insertdb(Weixiner, _user);
+    // })
+    // await Promise.all(promises);
 
+    if (!user.username) {
+      tool.clog(`微信 id- ${weixin} 未匹配到微信账号。跳过。`);
+      return status;
+    }
+    tool.clog(user);
+
+    // user 更新 usercn, userurl
+    user._id = id;
+    await tool.insertdb(Weixiner, user);
+    
+    let {username} = user;
     let cdata = await getContentList(user);
+    if (!cdata) {
+      tool.cerror(`微信文章列表被封。已自动重新拨号。`);
+      return status = false;
+    }
     let {biz, contents} = cdata;
-    if (!contents.trim()) {
-      await tool.handler(new Error('微信被封。'));
-      return;
-    }
     let _user = {
-      _id: userid,
-      biz: biz
+      _id: id,
+      biz
     }
+    // user 更新 biz
     await tool.insertdb(Weixiner, _user);
+
     let contentList = JSON.parse(contents).list;
     let lists = parseList(contentList);
     tool.clog(`${weixin} ${lists.length} 篇文章。`)
 
     let index = 0;
     for (let item of lists) {
-      console.log(++index);
+      tool.clog(++index);
+
       // content 采集
       let temp = `${item.content_url.slice(0, -1)}${config.suf}`,
         sourceurl = item.source_url;
+      
+      // 部分链接没有阅读量接口提取不到阅读量，跳过
+      // https://mp.weixin.qq.com/s?__biz=MjM5NzcxNzEyMA==&mid=2649675104&idx=3&sn=3638a6f427178805010b3eb5187139f5&chksm=becfc08f89b84999b31fef2cd28e7b4e1ac8e79a281300590dbdaae8f8ba12a705d590675e88&scene=27#wechat_redirect
+      if (temp.includes('mp.weixin.qq.com') && (!temp.includes('signature'))) {
+        tool.clog(temp);
+        tool.clog(`上面链接没有阅读量接口提取不到阅读量，跳过`);
+        continue;
+      }
+
       temp = temp.replace(/amp;/g, '');
+      temp = temp.replace(/https?\:\/\/mp\.weixin\.qq\.com/, ''); // 截取掉部分带前缀的链接
       let jsonurl = `${config.preContent}${temp}`;
       let _content = {
-        userid: userid,
+        username: username,
         contenturl: item.content_url,
         sourceurl: item.source_url,
         jsonurl: jsonurl,
@@ -256,14 +309,18 @@ const start = async (weixin = 'rmrbwx') => {
         cover: item.cover
       }
       let cdata = await getContent(_content);
+      if (!cdata) {
+        tool.cerror(`文章内容数据返回 null`);
+        return status = false;
+      }
       cdata = JSON.parse(cdata);
-      console.log(cdata.title);
+      tool.clog(cdata.title);
       let commentid = cdata.comment_id;
       let text = cdata.content_noencode.replace(/<\/?[^>]*>/g, '').replace(/&nbsp;/ig, '');
-      let _id = [userid, commentid].join('');
+      let _id = [username, commentid].join('');
       let content: Content = {
         _id: _id,
-        userid,
+        username,
         commentid,
         sourceurl,
         biz: cdata.bizuin,
@@ -275,28 +332,60 @@ const start = async (weixin = 'rmrbwx') => {
         publishtime: cdata.ori_create_time,
         cover: cdata.cdn_url,
       }
+      // contents 插入数据库
       await tool.insertdb(Content, content);
 
       // read 采集
       let commenturl = `${config.preRead}${temp.slice(2)}`;
       let data = await getRead(commenturl);
+      if (!data) {
+        tool.cerror(`文章阅读数据返回 null`);
+        return status = false;
+      }
       data = JSON.parse(data);
       let _read = {
         _id: _id,
         read: data.read_num,
         like: data.like_num
       }
+      // contents 更新 read, like
       await tool.insertdb(Content, _read);
     }
     tool.clog(`${weixin} crawl over.`);
+    return status;
   } catch (error) {
     await tool.handler(error);
   }
 }
 
 const test = async () => {
-  while(true){
-    await start();
+  try {
+    while (true) {
+      let weixiner = await Weixiner.findOneAndUpdate({ sostatus: 0 }, { $set: { sostatus: 1 } }, { sort: { soupdated: 1 } });
+      if (weixiner) {
+        let id = weixiner._id;
+        let weixin = weixiner.username;
+        tool.clog(`now crawl weixin ${weixin}`);
+        let status = await start(id, weixin);
+        tool.clog(status);
+        if (status) {
+          await Weixiner.findOneAndUpdate({ _id: id }, { $set: { sostatus: 0, soupdated: new Date() } });
+        } else {
+          await Weixiner.findOneAndUpdate({ _id: id }, { $set: { sostatus: 0 } });
+        }
+        tool.clog(`crawl ${weixin} over, next.`);
+        tool.clog(`==> ==> ==> ==> ==> ==> ==> ==> ==>`);
+        id = null;
+        weixin = null;
+      } else {
+        tool.clog(`所有微信号已更新。休息十分钟。`);
+        tool.clog(`====================================`);
+        await tool.sleep(60 * 10);
+      }
+    }
+  } catch (error) {
+    tool.handler(error);
+    await test();
   }
 }
 
@@ -309,5 +398,13 @@ if (module.parent) {
     getRead
   }
 } else {
+  tool.clog(`第 1 个参数是数据库地址，应用在 config 文件；第 2 个参数是服务器密码，应用在 tool 文件。`);
+  tool.clog(process.argv);
+  if (process.argv.length < 3) {
+    tool.cerror(`缺少参数。`);
+    process.exit();
+  } else if(process.argv.length < 4) {
+    tool.clog(`缺少服务器密码参数，只能本地测试或者初始化。`);
+  }
   test();
 }

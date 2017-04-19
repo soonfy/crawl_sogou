@@ -3,6 +3,7 @@ import * as mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const ContentSchema = new Schema({
+  // 
   _id: {
     type: String,
     unique: true
@@ -25,9 +26,6 @@ const ContentSchema = new Schema({
   desc: {
     type: String,
   },
-  // html: {
-  //   type: String,
-  // },
   text: {
     type: String,
   },
@@ -48,7 +46,7 @@ const ContentSchema = new Schema({
   }
 })
 
-const Content = mongoose.model('CONTENT', ContentSchema, 'contents');
+const Content = mongoose.model('CONTENT', ContentSchema, 'so_articles');
 
 export {
   Content

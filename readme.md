@@ -1,6 +1,24 @@
-sougou weixin
+# sougou weixin
+
+## deploy  
+
+1. linux server  
+```
+pm2 start app/index.js --name sogou_sf -- <数据库地址> <服务器密码>
+```
+
+2. local start  
+```
+node app/index.js <数据库地址>
+```
+
+3. local init  
+```
+node app/init.js <数据库地址>
+```
 
 #### demo  
+
 ```
 rmrbwx搜索
 http://weixin.sogou.com/weixin?type=1&query=rmrbwx&ie=utf8&s_from=input&_sug_=y&_sug_type_=
@@ -25,7 +43,7 @@ rmrbwx阅读量
 https://mp.weixin.qq.com/mp/getcomment?src=3&ver=1&timestamp=1492476244&signature=nm4eTyFvrPvO9774edf8*8ODZdROXU8BVn5e87Vv7HdH2Z5-fi9MzO1j4KcLNz5XB2tCQ7dO63auypf1kSRrO8agKpA6T1ppElPA6v7ATx9cE0D9pibsBWY0BK2k1*u8m5RWjGy3I7hgQ1HGfpKLPP0KYfWsl0tIZm0JXr2p3uU%3D&&uin=&key=&pass_ticket=&wxtoken=&devicetype=&clientversion=0&x5=0&f=json
 ```
 
-#### 请求汇总  
+#### request  
 
 1. 查询微信号  
 ```
@@ -45,4 +63,12 @@ https://mp.weixin.qq.com/s?timestamp=1492478551&src=3&ver=1&signature=nm4eTyFvrP
 4. 获取阅读量  
 ```
 https://mp.weixin.qq.com/mp/getcomment?timestamp=1492479106&src=3&ver=1&signature=nm4eTyFvrPvO9774edf8*3a0NqjoyYCGcIEXUzvalK-zOgs9pIPnnk0kJriol*A*4LZfL*pSHDXeVI6e--LjZf1uf2yZmp1o4MaiRE28c8id-Q7UhYjHI7tNWDSfNbqrFUvMB7kYBnisy92qgXcQSa9J73ZS8PiHwuevRvlqlqM%3D&&uin=&key=&pass_ticket=&wxtoken=&devicetype=&clientversion=0&x5=0&f=json  
+```
+
+#### content url  
+
+```
+https://mp.weixin.qq.com/s?timestamp=1492586285&src=3&ver=1&signature=Zrw08FkldFbFyP9vnViiHKodK6ZkOaAkua-8eFt4v7OKwPWUJAMBBgnpzWeJyPQCPlCyMxvamRTJgU2ZjcYmmkqu9k5FQdUeyveRwBoYtQzSR39Oej2BsnJ2PH0Muf5z281Dsrd*yJScLq17USCdjZlrqwzeQB1Fp9vXWNCgpBQ=
+
+https://mp.weixin.qq.com/s?__biz=MjM5NzcxNzEyMA==&mid=2649675104&idx=2&sn=f5f59608226a5088b15086c046dafd84&chksm=becfc08f89b84999ed304426f22d03116e7935776bb5646ac0fea6d53995e2c16a11bdbe7e4b&scene=27#wechat_redirect
 ```

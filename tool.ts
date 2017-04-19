@@ -1,5 +1,6 @@
 import * as child_process from 'child_process';
 import * as fs from 'fs';
+import * as os from 'os';
 
 const sleep = async (time = 10) => {
   return new Promise((resolve) => {
@@ -22,7 +23,7 @@ const handler = async (error) => {
   // cerror(error);
   cerror(error.message);
   fs.appendFile('./logs/error.log', JSON.stringify(error, null, 2), () => {
-    if(error){
+    if (error) {
       cerror(error);
     }
   })
@@ -32,9 +33,9 @@ const handler = async (error) => {
 
 const insertdb = async (model, obj) => {
   try {
-    // let weixiner = await model.findOneAndUpdate({ _id: obj._id }, { $set: obj }, { upsert: true, new: true });
-    // clog(weixiner._id);
-    // return weixiner;
+    let weixiner = await model.findOneAndUpdate({ _id: obj._id }, { $set: obj }, { upsert: true, new: true });
+    clog(weixiner._id);
+    return weixiner;
   } catch (error) {
     await handler(error);
     return await insertdb(model, obj);
@@ -43,8 +44,12 @@ const insertdb = async (model, obj) => {
 
 const changeip = async () => {
   try {
+    if (os.platform() !== 'linux') {
+      cerror(`不是 linux 服务器，不支持自动拨号。`);
+      return;
+    }
     const pppREG = /ppp(\d+)/gim;
-    const password = process.argv[2];
+    const password = process.argv[3];
     clog(password);
     if (!password) {
       await handler(new Error(`no password.`));
@@ -61,9 +66,10 @@ const changeip = async () => {
     await sleep(10);
     let ips = child_process.execSync(`ifconfig`).toString();
     clog(ips);
-    let ppp = ips.match(pppREG);
-    if (ppp) {
-      ppp = ppp[0];
+    let match = ips.match(pppREG),
+      ppp;
+    if (match) {
+      ppp = match[0];
       clog(`match ${ppp}.`)
     } else {
       await handler(new Error(`no match ppp. wait 10s to restart auto pppoe.`));
@@ -77,11 +83,20 @@ const changeip = async () => {
   }
 }
 
+const check = (html) => {
+  let auth = true;
+  if (html && html.includes('请输入验证码')) {
+    auth = false;
+  }
+  return auth;
+}
+
 export {
   sleep,
   clog,
   cerror,
   handler,
   insertdb,
-  changeip
+  changeip,
+  check
 }

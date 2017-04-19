@@ -4,24 +4,35 @@ const Schema = mongoose.Schema;
 
 const WeixinerSchema = new Schema({
   _id: {
-    type: String,
+    type: String, // MjM5MzE3NTg3MA==
     unique: true
   },
-  user: {
-    type: String,
+  username: {
+    type: String, // zjjly008
+    index: true
+  },
+  usercn: {
+    type: String, // 
   },
   userurl: {
     type: String,
   },
-  updated: {
+  soupdated: {
     type: Date,
+  },
+  sostatus: {
+    // 0 - 准备, 1 - 正在, 2 - 错误
+    type: Number,
+    default: 0
   },
   biz: {
     type: String,
   }
 })
 
-const Weixiner = mongoose.model('WEIXINER', WeixinerSchema, 'weixiners');
+WeixinerSchema.index({sostatus: 1, soupdated: 1});
+
+const Weixiner = mongoose.model('WEIXINER', WeixinerSchema, 'so_weixiners');
 
 export {
   Weixiner
