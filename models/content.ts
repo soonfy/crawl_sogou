@@ -11,6 +11,9 @@ const ContentSchema = new Schema({
   username: {
     type: String,
   },
+  nonce: {
+    type: Number,
+  },
   commentid: {
     type: Number,
   },

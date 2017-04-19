@@ -28,6 +28,7 @@ interface ContentList {
 interface Content {
   _id: string,
   username: string,
+  nonce: number,
   commentid: number,
   contenturl: string,
   sourceurl: string,
@@ -317,8 +318,8 @@ const start = async (id, weixin) => {
       cdata = JSON.parse(cdata);
       tool.clog(cdata.title);
       if (!cdata.title) {
-        tool.cerror(`文章涉嫌违规已被删除。`);
-        return status = false;
+        tool.clog(`文章涉嫌违规已被删除。`);
+        continue;
       }
       let commentid = cdata.comment_id;
       let text = cdata.content_noencode.replace(/<\/?[^>]*>/g, '').replace(/&nbsp;/ig, '');
@@ -326,6 +327,7 @@ const start = async (id, weixin) => {
       let content: Content = {
         _id: _id,
         username,
+        nonce: cdata.csp_nonce_str,
         commentid,
         contenturl: jsonurl,
         sourceurl,
