@@ -46,6 +46,10 @@ const ContentSchema = new Schema({
   },
   like: {
     type: Number,
+  },
+  created: {
+    type: Date,
+    index: true
   }
 })
 

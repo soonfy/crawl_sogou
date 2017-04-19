@@ -39,6 +39,7 @@ interface Content {
   published: string,
   publishtime: string,
   cover: string,
+  created: {}
 }
 
 /**
@@ -315,6 +316,10 @@ const start = async (id, weixin) => {
       }
       cdata = JSON.parse(cdata);
       tool.clog(cdata.title);
+      if (!cdata.title) {
+        tool.cerror(`文章涉嫌违规已被删除。`);
+        return status = false;
+      }
       let commentid = cdata.comment_id;
       let text = cdata.content_noencode.replace(/<\/?[^>]*>/g, '').replace(/&nbsp;/ig, '');
       let _id = [username, commentid].join('');
@@ -332,6 +337,7 @@ const start = async (id, weixin) => {
         published: cdata.create_time,
         publishtime: cdata.ori_create_time,
         cover: cdata.cdn_url,
+        created: new Date()
       }
       // contents 插入数据库
       await tool.insertdb(Content, content);
