@@ -1,8 +1,8 @@
 import * as mongoose from 'mongoose';
 // const dburl = `mongodb://localhost/sogou`;
 let dburl;
-if (process.argv[2]) {
-  dburl = process.argv[2] ? process.argv[2].trim() || `mongodb://localhost/sogou` : '';
+if (process.argv[2].includes('mongodb')) {
+  dburl = process.argv[2] ? process.argv[2].trim() : '';
   mongoose.connect(dburl);
 }
 
