@@ -21,7 +21,7 @@ const start = async (weixin = 'rmrbwx', time = 5) => {
     let index = 0;
     for (let item of lists) {
       tool.clog(++index);
-      tool.sleep(time);
+      await tool.sleep(time);
 
       // content 采集
       let temp = `${item.content_url.slice(0, -1)}${config.suf}`,
@@ -95,4 +95,10 @@ const test = async () => {
   }
 }
 
-test();
+if (process.argv[2] && process.argv[2].trim() === 'crawl') {
+  test();
+} else if (process.argv[2] && process.argv[2].trim() === 'ip') {
+  tool.changeip();
+} else {
+  tool.clog(`参数不正确。输入 crawl 或者 ip`);
+}

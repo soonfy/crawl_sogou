@@ -2,12 +2,6 @@ import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 
-const sleep = async (time = 10) => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, time * 1000);
-  })
-}
-
 const clog = (...rest) => {
   rest.unshift(`[log]`, `[${new Date().toLocaleString()}]`);
   console.log.apply(console, rest);
@@ -16,6 +10,13 @@ const clog = (...rest) => {
 const cerror = (...rest) => {
   rest.unshift(`[error]`, `[${new Date().toLocaleString()}]`);
   console.error.apply(console, rest);
+}
+
+const sleep = async (time = 10) => {
+  return new Promise((resolve) => {
+    console.log(`sleep ${time}s.`);
+    setTimeout(resolve, time * 1000);
+  })
 }
 
 const handler = async (error) => {
