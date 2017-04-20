@@ -96,6 +96,7 @@ const test = async () => {
 }
 
 if (process.argv[2] && process.argv[2].trim() === 'crawl') {
+  let time = parseInt(process.argv[3] ? process.argv[3].trim(): '5');
   test();
 } else if (process.argv[2] && process.argv[2].trim() === 'ip') {
   tool.changeip();
