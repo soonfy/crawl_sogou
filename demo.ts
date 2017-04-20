@@ -83,12 +83,12 @@ const start = async (weixin = 'rmrbwx', time = 5) => {
   }
 }
 
-const test = async () => {
+const test = async (time) => {
   try {
     let index = 0;
     while (true) {
       tool.clog(++index);
-      await start('rmrbwx', 2);
+      await start('rmrbwx', time);
     }
   } catch (error) {
     tool.cerror(error);
@@ -97,7 +97,7 @@ const test = async () => {
 
 if (process.argv[2] && process.argv[2].trim() === 'crawl') {
   let time = parseInt(process.argv[3] ? process.argv[3].trim(): '5');
-  test();
+  test(time);
 } else if (process.argv[2] && process.argv[2].trim() === 'ip') {
   tool.changeip();
 } else {
