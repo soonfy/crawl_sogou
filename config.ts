@@ -1,7 +1,11 @@
 import * as mongoose from 'mongoose';
 // const dburl = `mongodb://localhost/sogou`;
-const dburl = process.argv[2].trim() || `mongodb://localhost/sogou`;
-mongoose.connect(dburl);
+let dburl;
+if (process.argv[2]) {
+  dburl = process.argv[2] ? process.argv[2].trim() || `mongodb://localhost/sogou` : '';
+  mongoose.connect(dburl);
+}
+
 const connection = mongoose.connection;
 connection.on('connected', () => {
   console.log(`conected dburl ${dburl}`);
@@ -15,9 +19,9 @@ connection.on('connected', () => {
 const weixinhost = `mp.weixin.qq.com`;
 const sogouhost = `weixin.sogou.com`;
 
-const suf = `%3D&&uin=&key=&pass_ticket=&wxtoken=&devicetype=&clientversion=0&x5=0&f=json`;
 const preContent = `https://mp.weixin.qq.com`;
 const preRead = `https://mp.weixin.qq.com/mp/getcomment`;
+const suf = `%3D&&uin=&key=&pass_ticket=&wxtoken=&devicetype=&clientversion=0&x5=0&f=json`;
 
 const options = {
   url: '',

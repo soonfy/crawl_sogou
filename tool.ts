@@ -49,7 +49,7 @@ const changeip = async () => {
       return;
     }
     const pppREG = /ppp(\d+)/gim;
-    const password = process.argv[3].trim();
+    const password = process.argv[3] && process.argv[3].trim();
     clog(password);
     if (!password) {
       await handler(new Error(`no password.`));

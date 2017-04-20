@@ -285,6 +285,7 @@ const start = async (id, weixin) => {
 
     let index = 0;
     for (let item of lists) {
+      await tool.sleep(3);
       tool.clog(++index);
 
       // content 采集
@@ -352,7 +353,12 @@ const start = async (id, weixin) => {
         tool.cerror(`文章阅读数据返回 null`);
         return status = false;
       }
-      data = JSON.parse(data);
+      try {
+        data = JSON.parse(data);
+      } catch (error) {
+        data = data.replace('\u0014\u0003', ' ');
+        data = JSON.parse(data);
+      }
       let _read = {
         _id: _id,
         read: data.read_num,
@@ -405,7 +411,9 @@ if (module.parent) {
     search,
     getContentList,
     getContent,
-    getRead
+    getRead,
+    start,
+    parseList
   }
 } else {
   tool.clog(`第 1 个参数是数据库地址，应用在 config 文件；第 2 个参数是服务器密码，应用在 tool 文件。`);
