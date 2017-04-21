@@ -3,10 +3,11 @@ import { search, getContentList, parseList, getContent, getRead } from './index'
 import * as tool from './tool';
 import * as config from './config';
 
-const start = async (weixin = 'rmrbwx', time = 5) => {
+const start = async (weixin = 'rmrbwx', time = 60) => {
   try {
     tool.clog(`now is test ${weixin}.`);
 
+    await tool.sleep(time);
     let udata = await search(weixin);
     tool.clog(udata);
 
@@ -21,7 +22,6 @@ const start = async (weixin = 'rmrbwx', time = 5) => {
     let index = 0;
     for (let item of lists) {
       tool.clog(++index);
-      await tool.sleep(time);
 
       // content 采集
       let temp = `${item.content_url.slice(0, -1)}${config.suf}`,
@@ -44,6 +44,7 @@ const start = async (weixin = 'rmrbwx', time = 5) => {
         digest: item.digest,
         cover: item.cover
       }
+      await tool.sleep(time);
       let cdata = await getContent(_content);
       if (!cdata) {
         tool.cerror(`文章内容数据返回 null`);
@@ -60,6 +61,7 @@ const start = async (weixin = 'rmrbwx', time = 5) => {
 
       // read 采集
       let commenturl = `${config.preRead}${temp.slice(2)}`;
+      await tool.sleep(time);
       let data = await getRead(commenturl);
       if (!data) {
         tool.cerror(`文章阅读数据返回 null`);
