@@ -61,7 +61,7 @@ const start = async (weixin = 'rmrbwx', time = 60) => {
 
       // read 采集
       let commenturl = `${config.preRead}${temp.slice(2)}`;
-      await tool.sleep(time);
+      // await tool.sleep(time);
       let data = await getRead(commenturl);
       if (!data) {
         tool.cerror(`文章阅读数据返回 null`);
