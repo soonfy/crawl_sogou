@@ -149,7 +149,7 @@ const getContentList = async (user: User) => {
       //     tool.clog(`html to file success.`);
       //   }
       // });
-      await tool.changeip();
+      // await tool.changeip();
       return data = null;
     }
 
