@@ -7,7 +7,7 @@ const start = async (weixin = 'rmrbwx', time = 60) => {
   try {
     tool.clog(`now is test ${weixin}.`);
 
-    await tool.sleep(time);
+    // await tool.sleep(time);
     let udata = await search(weixin);
     tool.clog(udata);
 
