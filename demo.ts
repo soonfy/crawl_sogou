@@ -14,6 +14,10 @@ const start = async (weixin = 'rmrbwx', time = 60) => {
     let {user, users} = udata;
     let {username} = user;
     let cdata = await getContentList(user);
+    if (!cdata) {
+      console.log(`没有获取到数据。`);
+      process.exit();
+    }
     let {biz, contents} = cdata;
     let contentList = JSON.parse(contents).list;
     let lists = parseList(contentList);
