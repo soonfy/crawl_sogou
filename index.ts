@@ -287,7 +287,8 @@ const start = async (id, weixin) => {
 
     let index = 0;
     for (let item of lists) {
-      await tool.sleep(20);
+      await tool.sleep(10);
+
       tool.clog(++index);
 
       // content 采集
