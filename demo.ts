@@ -120,7 +120,7 @@ if (process.argv[2] && process.argv[2].trim() === 'crawl') {
 } else if (process.argv[2] && process.argv[2].trim() === 'ip') {
   tool.changeip();
 } else if (process.argv[2] && process.argv[2].trim() === 'dns'){
-  lookup(process.argv[3] ? process.argv[3].trim(): null);
+  process.argv[3] ? lookup(process.argv[3].trim()): lookup();
 }else{
-  tool.clog(`参数不正确。输入 crawl 或者 ip`);
+  tool.clog(`参数不正确。输入 crawl 或者 ip 或者dns`);
 }
