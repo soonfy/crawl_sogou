@@ -287,7 +287,7 @@ const start = async (id, weixin) => {
 
     let index = 0;
     for (let item of lists) {
-      await tool.sleep(10);
+      await tool.sleep(0);
 
       tool.clog(++index);
 
