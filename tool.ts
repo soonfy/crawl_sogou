@@ -61,7 +61,7 @@ const changeip = async () => {
     await sleep(2);
     child_process.execSync(`echo ${password} | sudo -S poff dsl1`);
     clog(`poff dsl1 success. wait 1m to pon dsl1.`)
-    await sleep(30);
+    await sleep(40);
     child_process.execSync(`echo ${password} | sudo -S pon dsl1`);
     clog(`pon dsl1 success.`)
     await sleep(2);
