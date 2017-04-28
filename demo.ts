@@ -64,24 +64,24 @@ const start = async (weixin = 'rmrbwx', time = 60) => {
       }
 
       // read 采集
-      let commenturl = `${config.preRead}${temp.slice(2)}`;
-      // await tool.sleep(time);
-      let data = await getRead(commenturl);
-      if (!data) {
-        tool.cerror(`文章阅读数据返回 null`);
-        continue;
-      }
-      try {
-        data = JSON.parse(data);
-      } catch (error) {
-        data = data.replace('\u0014\u0003', ' ');
-        data = JSON.parse(data);
-      }
-      let _read = {
-        read: data.read_num,
-        like: data.like_num
-      }
-      tool.clog(_read);
+      // let commenturl = `${config.preRead}${temp.slice(2)}`;
+      // // await tool.sleep(time);
+      // let data = await getRead(commenturl);
+      // if (!data) {
+      //   tool.cerror(`文章阅读数据返回 null`);
+      //   continue;
+      // }
+      // try {
+      //   data = JSON.parse(data);
+      // } catch (error) {
+      //   data = data.replace('\u0014\u0003', ' ');
+      //   data = JSON.parse(data);
+      // }
+      // let _read = {
+      //   read: data.read_num,
+      //   like: data.like_num
+      // }
+      // tool.clog(_read);
     }
     tool.clog(`test over.`);
   } catch (error) {

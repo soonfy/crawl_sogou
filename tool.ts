@@ -58,13 +58,13 @@ const changeip = async () => {
     }
     clog(`start auto pppoe.`)
     child_process.execSync(`echo ${password} | sudo -S pon dsl1`);
-    await sleep(10);
+    await sleep(2);
     child_process.execSync(`echo ${password} | sudo -S poff dsl1`);
     clog(`poff dsl1 success. wait 1m to pon dsl1.`)
-    await sleep(60);
+    await sleep(30);
     child_process.execSync(`echo ${password} | sudo -S pon dsl1`);
     clog(`pon dsl1 success.`)
-    await sleep(10);
+    await sleep(2);
     let ips = child_process.execSync(`ifconfig`).toString();
     clog(ips);
     let match = ips.match(pppREG),

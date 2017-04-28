@@ -149,7 +149,7 @@ const getContentList = async (user: User) => {
       //     tool.clog(`html to file success.`);
       //   }
       // });
-      // await tool.changeip();
+      await tool.changeip();
       return data = null;
     }
 
@@ -347,25 +347,25 @@ const start = async (id, weixin) => {
       await tool.insertdb(Content, content);
 
       // read 采集
-      let commenturl = `${config.preRead}${temp.slice(2)}`;
-      let data = await getRead(commenturl);
-      if (!data) {
-        tool.cerror(`文章阅读数据返回 null`);
-        return status = false;
-      }
-      try {
-        data = JSON.parse(data);
-      } catch (error) {
-        data = data.replace('\u0014\u0003', ' ');
-        data = JSON.parse(data);
-      }
-      let _read = {
-        _id: _id,
-        read: data.read_num,
-        like: data.like_num
-      }
-      // contents 更新 read, like
-      await tool.insertdb(Content, _read);
+      // let commenturl = `${config.preRead}${temp.slice(2)}`;
+      // let data = await getRead(commenturl);
+      // if (!data) {
+      //   tool.cerror(`文章阅读数据返回 null`);
+      //   return status = false;
+      // }
+      // try {
+      //   data = JSON.parse(data);
+      // } catch (error) {
+      //   data = data.replace('\u0014\u0003', ' ');
+      //   data = JSON.parse(data);
+      // }
+      // let _read = {
+      //   _id: _id,
+      //   read: data.read_num,
+      //   like: data.like_num
+      // }
+      // // contents 更新 read, like
+      // await tool.insertdb(Content, _read);
     }
     tool.clog(`${weixin} crawl over.`);
     return status;
