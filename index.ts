@@ -2,6 +2,7 @@ import * as rp from 'request-promise';
 import * as cheerio from 'cheerio';
 
 import * as fs from 'fs';
+import * as os from 'os';
 
 import * as tool from './tool';
 import * as config from './config';
@@ -40,7 +41,8 @@ interface Content {
   published: string,
   publishtime: string,
   cover: string,
-  created: {}
+  created: {},
+  server: string
 }
 
 /**
@@ -285,7 +287,7 @@ const start = async (id, weixin) => {
 
     let index = 0;
     for (let item of lists) {
-      await tool.sleep(3);
+      await tool.sleep(20);
       tool.clog(++index);
 
       // content 采集
@@ -341,7 +343,8 @@ const start = async (id, weixin) => {
         published: cdata.create_time,
         publishtime: cdata.ori_create_time,
         cover: cdata.cdn_url,
-        created: new Date()
+        created: new Date(),
+        server: os.userInfo().username
       }
       // contents 插入数据库
       await tool.insertdb(Content, content);

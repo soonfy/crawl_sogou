@@ -53,6 +53,9 @@ const ContentSchema = new Schema({
   created: {
     type: Date,
     index: true
+  },
+  server: {
+    type: String
   }
 })
 

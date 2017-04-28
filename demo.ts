@@ -1,4 +1,5 @@
 import * as dns from 'dns';
+import * as os from 'os';
 
 import { search, getContentList, parseList, getContent, getRead } from './index';
 
@@ -123,4 +124,5 @@ if (process.argv[2] && process.argv[2].trim() === 'crawl') {
   process.argv[3] ? lookup(process.argv[3].trim()): lookup();
 }else{
   tool.clog(`参数不正确。输入 crawl 或者 ip 或者dns`);
+  console.log(os.userInfo().username);
 }
