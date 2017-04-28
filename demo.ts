@@ -1,3 +1,5 @@
+import * as dns from 'dns';
+
 import { search, getContentList, parseList, getContent, getRead } from './index';
 
 import * as tool from './tool';
@@ -101,11 +103,24 @@ const test = async (time) => {
   }
 }
 
+const lookup = (addr = 'weixin.sogou.com') => {
+  dns.lookup(addr, (error, ip, family) => {
+    if(error){
+      console.error(error);
+    }else{
+      console.log(`ip`, ip);
+      console.log(`family`, family);
+    }
+  })
+}
+
 if (process.argv[2] && process.argv[2].trim() === 'crawl') {
   let time = parseInt(process.argv[3] ? process.argv[3].trim(): '5');
   test(time);
 } else if (process.argv[2] && process.argv[2].trim() === 'ip') {
   tool.changeip();
-} else {
+} else if (process.argv[2] && process.argv[2].trim() === 'dns'){
+  lookup(process.argv[3] ? process.argv[3].trim(): null);
+}else{
   tool.clog(`参数不正确。输入 crawl 或者 ip`);
 }
