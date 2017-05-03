@@ -80,7 +80,8 @@ const search = async (weixin) => {
       //     tool.clog(`html to file success.`);
       //   }
       // });
-      await tool.changeip();
+      // await tool.changeip();
+      await tool.sleep(60 * 2);
       return data = null;
     }
 
@@ -151,7 +152,8 @@ const getContentList = async (user: User) => {
       //     tool.clog(`html to file success.`);
       //   }
       // });
-      await tool.changeip();
+      // await tool.changeip();
+      await tool.sleep(60 * 2);
       return data = null;
     }
 
