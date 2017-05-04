@@ -26,9 +26,6 @@ const start = async (weixin = 'rmrbwx', time = 60) => {
     let lists = parseList(contentList);
     tool.clog(`${weixin} ${lists.length} 篇文章。`);
 
-    // let lists = ['']
-    console.log(lists[0]);
-
     let index = 0;
     for (let item of lists) {
       tool.clog(++index);
