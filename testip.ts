@@ -55,5 +55,5 @@ const stat = () => {
   }
 }
 
-// start(2);
-stat();
+start(2);
+// stat();
