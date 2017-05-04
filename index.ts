@@ -153,7 +153,9 @@ const getContentList = async (user: User) => {
       //   }
       // });
       // await tool.changeip();
-      await tool.sleep(60 * 2);
+      console.log(new Date());
+      console.log(`休息1小时重试。`);
+      await tool.sleep(60 * 60);
       return data = null;
     }
 
