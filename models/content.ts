@@ -55,7 +55,8 @@ const ContentSchema = new Schema({
     index: true
   },
   server: {
-    type: String
+    type: String,
+    index: true
   }
 })
 
