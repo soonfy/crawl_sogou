@@ -5,32 +5,25 @@ const Schema = mongoose.Schema;
 const WeixinerSchema = new Schema({
   _id: {
     type: String, // MjM5MzE3NTg3MA==
-    unique: true
   },
   username: {
     type: String, // zjjly008
-    index: true
   },
-  usercn: {
-    type: String, // 
-  },
-  userurl: {
-    type: String,
-  },
-  soupdated: {
-    type: Date,
-  },
-  sostatus: {
-    // 0 - 准备, 1 - 正在, 2 - 错误
+  crawl_status: {
+    // 0 - 准备, 1 - 正在, 2 - 错误, -2 - 名字不匹配, -1 - 没名字
     type: Number,
     default: 0
   },
-  biz: {
-    type: String,
+  crawl_update: {
+    type: Date,
   }
 })
 
-WeixinerSchema.index({sostatus: 1, soupdated: 1});
+WeixinerSchema.index({username: 1 });
+WeixinerSchema.index({crawl_update: 1 });
+
+WeixinerSchema.index({_id: 1, crawl_status: 1});
+WeixinerSchema.index({crawl_status: 1, crawl_update: 1});
 
 const Weixiner = mongoose.model('WEIXINER', WeixinerSchema, 'so_weixiners');
 

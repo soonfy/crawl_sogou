@@ -22,7 +22,9 @@
     "@types/node": "^7.0.12",
     "@types/request-promise": "^4.1.33",
     "cheerio": "^0.22.0",
+    "moment": "^2.18.1",
     "mongoose": "^4.9.5",
+    "monitor-node": "^1.0.10",
     "request": "^2.81.0",
     "request-promise": "^4.2.0"
   }

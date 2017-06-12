@@ -8,7 +8,7 @@ import * as tool from './tool';
 import * as config from './config';
 
 import { Weixiner } from './models/weixiner';
-import { Content } from './models/content';
+import { Article } from './models/article';
 
 interface User {
   username: string,
@@ -81,7 +81,7 @@ const search = async (weixin) => {
       //   }
       // });
       // await tool.changeip();
-      await tool.sleep(60 * 2);
+      await tool.sleep(60 * 1);
       return data = null;
     }
 
@@ -270,7 +270,7 @@ const start = async (id, weixin) => {
     // user 更新 usercn, userurl
     user._id = id;
     await tool.insertdb(Weixiner, user);
-    
+
     let {username} = user;
     let cdata = await getContentList(user);
     if (!cdata) {
@@ -299,7 +299,7 @@ const start = async (id, weixin) => {
       let temp = `${item.content_url.slice(0, -1)}${config.suf}`,
         sourceurl = item.source_url;
       temp = temp.replace(/amp;/g, '');
-      
+
       // 部分链接没有阅读量接口提取不到阅读量，跳过
       // https://mp.weixin.qq.com/s?__biz=MjM5NzcxNzEyMA==&mid=2649675104&idx=3&sn=3638a6f427178805010b3eb5187139f5&chksm=becfc08f89b84999b31fef2cd28e7b4e1ac8e79a281300590dbdaae8f8ba12a705d590675e88&scene=27#wechat_redirect
       if (temp.includes('mp.weixin.qq.com') && (!temp.includes('signature'))) {
@@ -352,7 +352,7 @@ const start = async (id, weixin) => {
         server: os.userInfo().username
       }
       // contents 插入数据库
-      await tool.insertdb(Content, content);
+      await tool.insertdb(Article, content);
 
       // read 采集
       // let commenturl = `${config.preRead}${temp.slice(2)}`;
@@ -390,13 +390,17 @@ const test = async () => {
         let id = weixiner._id;
         let weixin = weixiner.username;
         tool.clog(`now crawl weixin ${weixin}`);
-        let status = await start(id, weixin);
-        tool.clog(status);
-        if (status) {
-          await Weixiner.findOneAndUpdate({ _id: id }, { $set: { sostatus: 0, soupdated: new Date() } });
-        } else {
-          await Weixiner.findOneAndUpdate({ _id: id }, { $set: { sostatus: 0 } });
-        }
+
+        let udata = await search(weixin);
+        console.log(udata);
+
+        // let status = await start(id, weixin);
+        // tool.clog(status);
+        // if (status) {
+        //   await Weixiner.findOneAndUpdate({ _id: id }, { $set: { sostatus: 0, soupdated: new Date() } });
+        // } else {
+        //   await Weixiner.findOneAndUpdate({ _id: id }, { $set: { sostatus: 0 } });
+        // }
         tool.clog(`crawl ${weixin} over, next.`);
         tool.clog(`==> ==> ==> ==> ==> ==> ==> ==> ==>`);
         id = null;
@@ -410,6 +414,44 @@ const test = async () => {
   } catch (error) {
     tool.handler(error);
     await test();
+  }
+}
+
+/**
+ *  过滤微信账号
+ */
+const filter_starter = async () => {
+  try {
+    while (true) {
+      let weixiner = await Weixiner.findOneAndUpdate({ crawl_status: 1, crawl_update: { $lt: Date.now() - 1000 * 60 * 20 } }, { $set: { crawl_update: new Date() } });
+      if (!weixiner) {
+        weixiner = await Weixiner.findOneAndUpdate({ crawl_status: 0 }, { $set: { crawl_status: 1, crawl_update: new Date() } }, { sort: { crawl_update: 1 } });
+      }
+      if (weixiner) {
+        let id = weixiner._id;
+        let weixin = weixiner.username;
+        tool.clog(`now crawl weixin ${weixin}`);
+        let status = await start(id, weixin);
+        tool.clog(status);
+        if (status) {
+          await Weixiner.findByIdAndUpdate(id, { $set: { crawl_status: 0, crawl_update: new Date() } });
+          // await Weixiner.findOneAndUpdate({ _id: id }, { $set: { crawl_status: 0, crawl_update: new Date() } });
+        } else {
+          await Weixiner.findByIdAndUpdate(id, { $set: { crawl_status: 0 } });
+          // await Weixiner.findOneAndUpdate({ _id: id }, { $set: { crawl_status: 0 } });
+        }
+        tool.clog(`crawl ${weixin} over, next.`);
+        tool.clog(`==> ==> ==> ==> ==> ==> ==> ==> ==>`);
+        id = null;
+        weixin = null;
+      } else {
+        tool.clog(`所有微信号已更新。休息十分钟。`);
+        tool.clog(`====================================`);
+        await tool.sleep(60 * 10);
+      }
+    }
+  } catch (error) {
+    tool.handler(error);
   }
 }
 
@@ -429,8 +471,9 @@ if (module.parent) {
   if (process.argv.length < 3) {
     tool.cerror(`缺少参数。`);
     process.exit();
-  } else if(process.argv.length < 4) {
+  } else if (process.argv.length < 4) {
     tool.clog(`缺少服务器密码参数，只能本地测试或者初始化。`);
   }
   test();
+  filter_starter();
 }
