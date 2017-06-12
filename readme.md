@@ -67,3 +67,21 @@ https://mp.weixin.qq.com/s?timestamp=1492586285&src=3&ver=1&signature=Zrw08FkldF
 
 https://mp.weixin.qq.com/s?__biz=MjM5NzcxNzEyMA==&mid=2649675104&idx=2&sn=f5f59608226a5088b15086c046dafd84&chksm=becfc08f89b84999ed304426f22d03116e7935776bb5646ac0fea6d53995e2c16a11bdbe7e4b&scene=27#wechat_redirect
 ```
+
+## linux
+  1. 新建用户
+  ```
+  sudo groupadd oopsdata
+  sudo useradd -s /bin/bash -g oopsdata –G root oliver
+  sudo usermod -d /home/oliver oliver
+  sudo passwd oliver
+  ```
+
+  2. sudo
+  ```
+  oliver is not in the sudoers file.  This incident will be reported.
+  whereis sudoers
+  sudo chmod u+w /etc/sudoers
+  oliver ALL=(ALL) ALL
+  sudo chmod -w /etc/sudoers
+  ```
