@@ -2,19 +2,14 @@
 
 ## deploy  
 
-1. linux server  
+1. crawl article list  
 ```
-pm2 start app/index.js --name sogou_sf -- <数据库地址> <服务器密码>
-```
-
-2. local start  
-```
-node app/index.js <数据库地址>
+pm2 start app/crawl_list.js --name weixin-list -- <数据库地址>
 ```
 
-3. local init  
+2. crawl article content 
 ```
-node app/init.js <数据库地址>
+pm2 start app/craw_article.js --name weixin-content -- <数据库地址>
 ```
 
 #### demo  
