@@ -36,6 +36,9 @@ const main = async () => {
     }
     let lists = await weixin.getContentList(user);
     // console.log(lists);
+    while(!list){
+      lists = await weixin.getContentList(user);
+    }
     let promises = lists.map(async (x) => {
       return await List.create({
         username: username,

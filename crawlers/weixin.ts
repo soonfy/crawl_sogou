@@ -64,7 +64,7 @@ const getContentList = async (user: User) => {
       await tool.handler(new Error('微信文章列表被封。休息1分钟再继续。'));
       // console.log(moment().format('YYYY-MM-DD hh:mm:ss'));
       await tool.sleep(60 * 1);
-      return await getContentList(user);
+      return;
     }
 
     let $ = cheerio.load(body);
