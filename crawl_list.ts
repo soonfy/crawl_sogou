@@ -36,8 +36,8 @@ const main = async () => {
     }
     let lists = await weixin.getContentList(user);
     // console.log(lists);
-    while(!list){
-      lists = await weixin.getContentList(user);
+    if(!lists){
+      await Weixiner.findOneAndUpdate({ _id: weixiner._id, crawl_status: 1 }, { $set: { crawl_status: 0, crawl_update: new Date() } });
     }
     let promises = lists.map(async (x) => {
       return await List.create({
