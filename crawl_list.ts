@@ -38,6 +38,7 @@ const main = async () => {
     // console.log(lists);
     if(!lists){
       await Weixiner.findOneAndUpdate({ _id: weixiner._id, crawl_status: 1 }, { $set: { crawl_status: 0, crawl_update: new Date() } });
+      return;
     }
     let promises = lists.map(async (x) => {
       return await List.create({
