@@ -67,11 +67,14 @@ const getContentList = async (user: User) => {
       return;
     }
 
+    console.log(body);
     let $ = cheerio.load(body);
     let scripts = $('script');
+    console.log(scripts.length);
     scripts.map((i, e) => {
       let text = $(e).text();
       if (text.includes(`document.domain="qq.com";`)) {
+        console.log(text);
         let match = text.match(bizReg);
         if (match) {
           let biz = match[1].replace(/[^\w=]/g, '');
@@ -83,8 +86,8 @@ const getContentList = async (user: User) => {
         }
       }
     })
-    // tool.clog(data);
-    let {biz, contents} = data;
+    tool.clog(data);
+    let { biz, contents } = data;
     let contentList = JSON.parse(contents).list;
     let lists = parseList(contentList);
     // tool.clog(lists);

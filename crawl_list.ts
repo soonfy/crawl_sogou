@@ -20,35 +20,36 @@ import { List } from './models/list';
 
 const main = async () => {
   try {
-    let weixiner = await Weixiner.findOneAndUpdate({ crawl_status: 1, crawl_update: { $lt: Date.now() - 1000 * 60 * 10 } }, { $set: { crawl_update: new Date() } }, { sort: { crawl_update: 1 } });
-    if (!weixiner) {
-      weixiner = await Weixiner.findOneAndUpdate({ crawl_status: 0 }, { $set: { crawl_status: 1, crawl_update: new Date() } }, { sort: { crawl_update: 1 } });
-    }
-    let {username} = weixiner;
+    // let weixiner = await Weixiner.findOneAndUpdate({ crawl_status: 1, crawl_update: { $lt: Date.now() - 1000 * 60 * 10 } }, { $set: { crawl_update: new Date() } }, { sort: { crawl_update: 1 } });
+    // if (!weixiner) {
+    //   weixiner = await Weixiner.findOneAndUpdate({ crawl_status: 0 }, { $set: { crawl_status: 1, crawl_update: new Date() } }, { sort: { crawl_update: 1 } });
+    // }
+    // let { username } = weixiner;
+    let username = 'rmrbwx';
     tool.clog(`采集公众号 ${username}。`)
-    console.log(weixiner);
+    // console.log(weixiner);
     let data = await sogou.search(username);
     // console.log(data);
-    let {user, users} = data;
+    let { user, users } = data;
     if (!user.username) {
       tool.clog(`搜狗未找到微信号 ${username}.`);
-      return await Weixiner.findOneAndUpdate({ _id: weixiner._id }, { $set: { crawl_status: -2 } })
+      // return await Weixiner.findOneAndUpdate({ _id: weixiner._id }, { $set: { crawl_status: -2 } })
     }
     let lists = await weixin.getContentList(user);
-    // console.log(lists);
-    if(!lists){
+    console.log(lists);
+    if (!lists) {
       return;
     }
-    let promises = lists.map(async (x) => {
-      return await List.create({
-        username: username,
-        crawl_url: x.content_url,
-        crawl_status: 0,
-        crawl_update: new Date()
-      })
-    })
-    await Promise.all(promises);
-    await Weixiner.findOneAndUpdate({ _id: weixiner._id, crawl_status: 1 }, { $set: { crawl_status: 0, crawl_update: new Date() } });
+    // let promises = lists.map(async (x) => {
+    //   return await List.create({
+    //     username: username,
+    //     crawl_url: x.content_url,
+    //     crawl_status: 0,
+    //     crawl_update: new Date()
+    //   })
+    // })
+    // await Promise.all(promises);
+    // await Weixiner.findOneAndUpdate({ _id: weixiner._id, crawl_status: 1 }, { $set: { crawl_status: 0, crawl_update: new Date() } });
     tool.clog(`微信号 ${username} 文章列表已存储。`);
   } catch (error) {
     tool.cerror(error);
@@ -61,9 +62,9 @@ const main = async () => {
 const start = async () => {
   try {
     while (true) {
+      console.log('=== start ===');
       await main();
-      let task = await monitor.update(mongoose);
-      tool.clog(task);
+      await tool.sleep(60 * 1);
     }
   } catch (error) {
     tool.cerror(error);
