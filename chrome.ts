@@ -12,7 +12,9 @@ const start = async () => {
     let ids = fs.readFileSync('./weixin.txt', 'utf-8').split('\n');
     // console.log(ids);
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      headless: true
+    });
     const page = await browser.newPage();
     await page.goto('http://weixin.sogou.com/');
 
