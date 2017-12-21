@@ -33,7 +33,7 @@ const start = async () => {
       console.log(uri);
       console.log('=== cookies ===');
       let cookies = await page.cookies(uri)
-      console.log(cookies);
+      console.log(cookies.length);
       fs.writeFileSync('./cookies/weixin-cookie-' + index + '-' + random + '.json', JSON.stringify(cookies));
 
       for (let cookie of cookies) {
