@@ -10,8 +10,7 @@ const start = async () => {
     console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
     let index = 0;
     let ids = fs.readFileSync('./weixin.txt', 'utf-8').split('\n');
-    console.log(ids);
-    process.exit();
+    // console.log(ids);
 
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
