@@ -23,6 +23,9 @@ const start = async () => {
       console.log(++index);
       let random = Math.floor(Math.random() * 100);
 
+      await page.click('.logo', { delay: 20 });
+      await page.waitFor(1000)
+
       await page.type('.qborder2 input[name=query]', ids[random], { delay: 20 })
       await page.click('.swz2', { delay: 20 });
 
@@ -37,15 +40,15 @@ const start = async () => {
       console.log(cookies.length);
       fs.writeFileSync('./cookies/weixin-cookie-' + index + '-' + random + '.json', JSON.stringify(cookies));
 
-      for (let cookie of cookies) {
-        await page.deleteCookie(cookie)
-      }
-      console.log('=== delete cookies ===');
-      cookies = await page.cookies(uri)
-      console.log(cookies);
+      // for (let cookie of cookies) {
+      //   await page.deleteCookie(cookie)
+      // }
+      // console.log('=== delete cookies ===');
+      // cookies = await page.cookies(uri)
+      // console.log(cookies.length);
 
       // console.log(await page.content());
-      
+
       // console.log(await page.$eval('body', el => el.outerHTML));
       // const searchValue = await page.$eval('.tit', el => el.outerHTML);
       // console.log(searchValue);
@@ -58,7 +61,7 @@ const start = async () => {
       // console.log(scriptValue);
       // const scriptsCounts = await page.$$eval('script', divs => divs.length);
       // console.log(scriptsCounts);
-      let time = Math.random() * 10 + 60;
+      let time = Math.random() * 10 + 10;
       await tool.sleep(time);
     }
 
@@ -66,6 +69,7 @@ const start = async () => {
 
   } catch (error) {
     console.error(error);
+    await start();
   }
 }
 

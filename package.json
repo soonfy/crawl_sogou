@@ -4,7 +4,8 @@
   "description": "sougou crawl weixin",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "phantomjs":"node_modules/.bin/phantomjs"
   },
   "keywords": [
     "sougou",
