@@ -91,6 +91,7 @@ https://mp.weixin.qq.com/s?__biz=MjM5NzcxNzEyMA==&mid=2649675104&idx=2&sn=f5f596
 
   1. 安装 chrome    
   ```
+  sudo apt-get install libgconf-2-4
   sudo apt-get install google-chrome-stable
   sudo apt-get install chromium-browser
   sudo wget https://repo.fdzh.org/chrome/google-chrome.list -P /etc/apt/sources.list.d/
