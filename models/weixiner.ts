@@ -9,24 +9,23 @@ const WeixinerSchema = new Schema({
   username: {
     type: String, // zjjly008
   },
-  crawl_status: {
+  crawl_interval: {
+    type: Number,
+  },
+  sogou_status: {
     // 0 - 准备, 1 - 正在, 2 - 错误, -2 - 名字不匹配, -1 - 没名字
     type: Number,
     default: 0
   },
-  crawl_update: {
+  sogou_update: {
+    // 0 - 准备, 1 - 正在, 2 - 错误, -2 - 名字不匹配, -1 - 没名字
     type: Date,
-  }
+    default: 0
+  },
 })
 
-WeixinerSchema.index({username: 1 });
-WeixinerSchema.index({crawl_update: 1 });
+WeixinerSchema.index({ sogou_status: 1, sogou_update: 1 });
 
-WeixinerSchema.index({_id: 1, crawl_status: 1});
-WeixinerSchema.index({crawl_status: 1, crawl_update: 1});
+const Weixiner = mongoose.model('WEIXINER', WeixinerSchema, 'weixiners');
 
-const Weixiner = mongoose.model('WEIXINER', WeixinerSchema, 'so_weixiners');
-
-export {
-  Weixiner
-};
+export default Weixiner;

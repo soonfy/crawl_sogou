@@ -19,11 +19,11 @@ const ListSchema = new Schema({
   }
 })
 
-ListSchema.index({username: 1 });
-ListSchema.index({crawl_update: 1 });
+// ListSchema.index({username: 1 });
+// ListSchema.index({crawl_update: 1 });
 
-ListSchema.index({_id: 1, crawl_status: 1});
-ListSchema.index({crawl_status: 1, crawl_update: 1});
+// ListSchema.index({_id: 1, crawl_status: 1});
+// ListSchema.index({crawl_status: 1, crawl_update: 1});
 
 const List = mongoose.model('LIST', ListSchema, 'so_lists');
 
