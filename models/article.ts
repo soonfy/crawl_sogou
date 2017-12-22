@@ -30,6 +30,9 @@ const ArticleSchema = new Schema({
   like: { // 点赞量
     type: Number,
   },
+  copyright: {  // 文章内容
+    type: Boolean,
+  },
   create_time: {  // 采集时间
     type: Date,
   }
