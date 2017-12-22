@@ -114,7 +114,8 @@ const start = async () => {
         console.log(`=== start -- all ${list_count}, now ${index} ===`);
         if (list_count === 0) {
           console.log('=== delete cookies ===');
-          let cookies = await list_page.cookies(uri);
+          let list_uri = await list_page.url();
+          let cookies = await list_page.cookies(list_uri);
           for (let cookie of cookies) {
             await list_page.deleteCookie(cookie);
           }
