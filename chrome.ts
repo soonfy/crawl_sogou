@@ -31,7 +31,7 @@ const start = async () => {
       console.log('=== next ===');
       console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
       if (moment().subtract(10, 'seconds') < start_time) {
-        await sleep(10);
+        await sleep(30);
       };
       start_time = moment();
       let weixiner = await Weixiner.findOneAndUpdate({ sogou_status: 1, sogou_update: { $lte: moment().subtract(10, 'minutes') } }, { $set: { sogou_status: 1, sogou_update: new Date() } }, { sort: { sogou_update: 1 } });
