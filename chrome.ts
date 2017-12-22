@@ -113,7 +113,16 @@ const start = async () => {
         let index = 0;
         console.log(`=== start -- all ${list_count}, now ${index} ===`);
         if (list_count === 0) {
+          console.log('=== delete cookies ===');
+          let cookies = await list_page.cookies(uri);
+          for (let cookie of cookies) {
+            await list_page.deleteCookie(cookie);
+          }
+          if (cookies.length === 0) {
+            console.log(`=== delete cookies over. ===`);
+          }
           console.log(await list_page.content());
+          continue;
         }
         while (index < list_count) {
           console.log(++index);
