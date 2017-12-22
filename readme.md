@@ -85,3 +85,26 @@ https://mp.weixin.qq.com/s?__biz=MjM5NzcxNzEyMA==&mid=2649675104&idx=2&sn=f5f596
   oliver ALL=(ALL) ALL
   sudo chmod -w /etc/sudoers
   ```
+
+
+## deploy　　　　
+
+  1. 安装 chrome    
+  ```
+  sudo wget https://repo.fdzh.org/chrome/google-chrome.list -P /etc/apt/sources.list.d/
+  wget -q -O - https://dl.google.com/linux/linux_signing_key.pub  | sudo apt-key add -
+  sudo apt-get update
+  sudo apt-get install google-chrome-stable
+  ```
+
+  2. 安装　puppeteer, typescript, ts-node 　　　　
+  ```
+  cnpm i puppeteer
+  cnpm i -g typescript
+  cnpm i -g ts-node
+  ```
+
+  3. start    
+  ```
+  pm2 start ts-node --name weixin-sogou -- chrome.js <mongo>
+  ```

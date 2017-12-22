@@ -10,10 +10,10 @@ const ArticleSchema = new Schema({
     type: String,
   },
   mid: {  // 消息id
-    type: String,
+    type: Number,
   },
   idx: {  // 消息偏移
-    type: String,
+    type: Number,
   },
   title: {  // 文章标题
     type: String,
@@ -32,6 +32,9 @@ const ArticleSchema = new Schema({
   },
   copyright: {  // 文章内容
     type: Boolean,
+  },
+  sogou_uri: {
+    type: String,
   },
   create_time: {  // 采集时间
     type: Date,

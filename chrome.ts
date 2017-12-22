@@ -31,7 +31,9 @@ const start = async () => {
       console.log('=== next ===');
       console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
       if (moment().subtract(10, 'seconds') < start_time) {
-        await sleep(30);
+        await sleep(Math.random() * 10 + 20);
+      } else {
+        await sleep(Math.random() * 5 + 5);
       };
       start_time = moment();
       let weixiner = await Weixiner.findOneAndUpdate({ sogou_status: 1, sogou_update: { $lte: moment().subtract(10, 'minutes') } }, { $set: { sogou_status: 1, sogou_update: new Date() } }, { sort: { sogou_update: 1 } });
@@ -142,6 +144,7 @@ const start = async () => {
           // console.log(await list_page.$eval('#js_content', el => el.textContent.trim()));
           // console.log(await list_page.$eval('#js_sg_bar a.meta_primary', el => el.href));
 
+          let sogou_uri = await list_page.url();
           let biz, mid, idx, _id;
           let reg_biz = /var\s*biz\s*=([^;]+)\;/;
           let reg_mid = /var\s*mid\s*=([^;]+)\;/;
@@ -172,17 +175,17 @@ const start = async () => {
             last_modified_at,
             content,
             copyright,
+            sogou_uri,
             create_time: new Date(),
           }
           // console.log(doc);
 
           let article = await Article.findByIdAndUpdate(doc._id, { $set: doc }, { upsert: true, new: true });
           console.log(article);
-          await sleep(1);
+          await sleep(Math.random() * 5 + 15);
 
           await list_page.goBack();
           list_count = (await list_page.$$('h4')).length;
-          await sleep(1);
         }
         await list_page.close();
         weixiner = await Weixiner.findByIdAndUpdate(weixiner._id, { $set: { sogou_status: 0 } });
