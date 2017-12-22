@@ -32,13 +32,21 @@ const start = async () => {
       await page.waitFor(1000)
       console.log('=== title ===');
       console.log(await page.title());
+
       console.log('=== uri ===');
       let uri = await page.url();
       console.log(uri);
       console.log('=== cookies ===');
       let cookies = await page.cookies(uri)
       console.log(cookies.length);
-      fs.writeFileSync('./cookies/weixin-cookie-' + index + '-' + random + '.json', JSON.stringify(cookies));
+      // fs.writeFileSync('./cookies/weixin-cookie-' + index + '-' + random + '.json', JSON.stringify(cookies));
+
+      if ((await page.title()).trim() === '搜狗搜索') {
+        console.log('=== delete cookies ===');
+        for (let cookie of cookies) {
+          await page.deleteCookie(cookie)
+        }
+      }
 
       // for (let cookie of cookies) {
       //   await page.deleteCookie(cookie)
