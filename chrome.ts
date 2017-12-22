@@ -164,13 +164,15 @@ const start = async () => {
             copyright,
             create_time: new Date(),
           }
-          console.log(doc);
+          // console.log(doc);
 
           let article = await Article.findByIdAndUpdate(doc._id, { $set: doc }, { upsert: true, new: true });
           console.log(article);
+          await sleep(1);
 
           await list_page.goBack();
           list_count = (await list_page.$$('h4')).length;
+          await sleep(1);
         }
         await list_page.close();
         weixiner = await Weixiner.findByIdAndUpdate(weixiner._id, { $set: { sogou_status: 0 } });
