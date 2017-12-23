@@ -33,6 +33,9 @@ const ArticleSchema = new Schema({
   copyright: {  // 文章内容
     type: Boolean,
   },
+  last_modified_at: {
+    type: Date,
+  },
   sogou_uri: {
     type: String,
   },
