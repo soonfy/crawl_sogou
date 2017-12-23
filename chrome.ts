@@ -17,7 +17,6 @@ const sleep = async (time = 10) => {
 
 const start = async () => {
   console.log('=== start ===');
-  console.log(config.dburl);
 
   const browser = await puppeteer.launch({
     headless: true,
