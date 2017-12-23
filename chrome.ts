@@ -126,6 +126,7 @@ const start = async () => {
             console.log(`=== delete cookies over. ===`);
           }
           console.log(await list_page.content());
+          await list_page.close();
           continue;
         }
         while (index < list_count) {
