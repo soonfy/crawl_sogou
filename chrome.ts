@@ -106,7 +106,7 @@ const start = async () => {
 
         console.log('=== pages length ===');
         console.log((await browser.pages()).length);
-        let list_page = (await browser.pages())[2];
+        let list_page = (await browser.pages()).pop();
         console.log(await list_page.url());
 
         console.log('=== list_page title ===');
