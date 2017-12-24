@@ -124,6 +124,7 @@ const start = async () => {
 
       console.log('=== list_page title ===');
       console.log(await list_page.title());
+      console.log(await list_page.content());
 
       let list_count = (await list_page.$$('h4')).length;
 
