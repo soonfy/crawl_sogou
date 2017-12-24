@@ -4,6 +4,7 @@ const devices = require('puppeteer/DeviceDescriptors');
 const iPhone = devices['iPhone 6'];
 
 import Article from './models/article';
+import ListArticle from './models/list_article';
 import Weixiner from './models/weixiner';
 
 import * as config from './config';
@@ -35,6 +36,7 @@ const start = async () => {
     } else {
       await sleep(Math.random() * 5 + 5);
     };
+    await sleep(Math.random() * 5 + 100);
     start_time = moment();
     let weixiner = await Weixiner.findOneAndUpdate({ sogou_status: 1, sogou_update: { $lte: moment().subtract(10, 'minutes') } }, { $set: { sogou_status: 1, sogou_update: new Date() } }, { sort: { sogou_update: 1 } });
     if (!weixiner) {
@@ -68,7 +70,18 @@ const start = async () => {
     // let cookies = await page.cookies(uri);
     // console.log(cookies.length);
 
-    if ((await page.title()).trim() === '搜狗搜索') {
+    if ((await page.title()).trim() === '搜狗搜索' && false) {
+      // console.log('=== delete cookies ===');
+      // let cookies = await page.cookies(uri);
+      // for (let cookie of cookies) {
+      //   await page.deleteCookie(cookie);
+      // }
+      // if (cookies.length === 0) {
+      //   console.log(`=== delete cookies over. ===`);
+      // }
+      // await browser.close();
+      // return;
+    } else {
       console.log('=== delete cookies ===');
       let cookies = await page.cookies(uri);
       for (let cookie of cookies) {
@@ -77,9 +90,6 @@ const start = async () => {
       if (cookies.length === 0) {
         console.log(`=== delete cookies over. ===`);
       }
-      await browser.close();
-      return;
-    } else {
       let usernames = await page.evaluate(() => {
         let as = [...document.querySelectorAll('div.txt-box')];
         return as.map((a) => {
@@ -116,84 +126,112 @@ const start = async () => {
       console.log(await list_page.title());
 
       let list_count = (await list_page.$$('h4')).length;
+
+      let list_articles = await list_page.evaluate(() => {
+        let as = [...document.querySelectorAll('h4')];
+        return as.map((a) => {
+          return {
+            title: a ? a.textContent.trim() : '',
+            sogou_uri: a.getAttribute('hrefs'),
+          }
+        });
+      });
+      list_articles = list_articles.map(x => {
+        x.create_time = new Date()
+        return x;
+      });
+      console.log(list_articles);
+
+      await ListArticle.create(list_articles);
+
       let index = 0;
       console.log(`=== start -- all ${list_count}, now ${index} ===`);
-      if (list_count === 0) {
-        console.log('=== delete cookies ===');
-        let list_uri = await list_page.url();
-        let cookies = await list_page.cookies(list_uri);
-        for (let cookie of cookies) {
-          await list_page.deleteCookie(cookie);
-        }
-        if (cookies.length === 0) {
-          console.log(`=== delete cookies over. ===`);
-        }
-        console.log(await list_page.content());
-        await list_page.close();
-        await browser.close();
-        return;
+      console.log('=== delete cookies ===');
+      let list_uri = await list_page.url();
+      let list_cookies = await list_page.cookies(list_uri);
+      for (let cookie of list_cookies) {
+        await list_page.deleteCookie(cookie);
       }
-      while (index < list_count) {
-        console.log(++index);
-        console.log(`=== all ${list_count}, now ${index} ===`);
-        await list_page.waitForSelector('h4');
-        await (await list_page.$$('h4'))[index - 1].click({ delay: 20 });
-
-        await list_page.waitForSelector('#post-date');
-        console.log('=== content title ===');
-        console.log(await list_page.title());
-        // console.log(await list_page.content());
-
-        // console.log(await list_page.$eval('#post-date', el => el.outerHTML));
-        // console.log(await list_page.$eval('#post-date', el => el.textContent.trim()));
-        // console.log(await list_page.$eval('.rich_media_meta_nickname', el => el.textContent.trim()));
-        // console.log(await list_page.$eval('#js_content', el => el.textContent.trim()));
-        // console.log(await list_page.$eval('#js_sg_bar a.meta_primary', el => el.href));
-
-        let sogou_uri = await list_page.url();
-        let biz, mid, idx, _id;
-        let reg_biz = /var\s*biz\s*=([^;]+)\;/;
-        let reg_mid = /var\s*mid\s*=([^;]+)\;/;
-        let reg_idx = /var\s*idx\s*=([^;]+)\;/;
-        let reg_sn = /var\s*sn\s*=([^;]+)\;/;
-        let body = await list_page.content();
-        let match = body.match(reg_biz);
-        biz = match[1].replace(/[\"\||\s]/g, '');
-        match = body.match(reg_mid);
-        mid = match[1].replace(/[\"\||\s]/g, '');
-        match = body.match(reg_idx);
-        idx = match[1].replace(/[\"\||\s]/g, '');
-        _id = `${biz}:${mid}:${idx}`;
-
-        let title = await list_page.title();
-        let author = await list_page.$eval('.rich_media_meta_nickname', el => el.textContent.trim());
-        let last_modified_at = new Date(await list_page.$eval('#post-date', el => el.textContent.trim()));
-        let content = await list_page.$eval('#js_content', el => el.textContent.trim());
-        let copyright = (await list_page.$('#copyright_logo')) ? true : false;
-
-        let doc = {
-          _id,
-          biz,
-          mid,
-          idx,
-          title,
-          author,
-          last_modified_at,
-          content,
-          copyright,
-          sogou_uri,
-          create_time: new Date(),
-        }
-        // console.log(doc);
-
-        let article = await Article.findByIdAndUpdate(doc._id, { $set: doc }, { upsert: true, new: true });
-        console.log(article);
-        await sleep(Math.random() * 5 + 15);
-
-        await list_page.goBack();
-        list_count = (await list_page.$$('h4')).length;
+      if (list_cookies.length === 0) {
+        console.log(`=== delete cookies over. ===`);
       }
+      // if (list_count === 0) {
+      //   console.log('=== delete cookies ===');
+      //   let list_uri = await list_page.url();
+      //   let cookies = await list_page.cookies(list_uri);
+      //   for (let cookie of cookies) {
+      //     await list_page.deleteCookie(cookie);
+      //   }
+      //   if (cookies.length === 0) {
+      //     console.log(`=== delete cookies over. ===`);
+      //   }
+      //   console.log(await list_page.content());
+      //   await list_page.close();
+      //   await browser.close();
+      //   return;
+      // }
+      // while (index < list_count) {
+      //   console.log(++index);
+      //   console.log(`=== all ${list_count}, now ${index} ===`);
+      //   await list_page.waitForSelector('h4');
+      //   await (await list_page.$$('h4'))[index - 1].click({ delay: 20 });
+
+      //   await list_page.waitForSelector('#post-date');
+      //   console.log('=== content title ===');
+      //   console.log(await list_page.title());
+      //   // console.log(await list_page.content());
+
+      //   // console.log(await list_page.$eval('#post-date', el => el.outerHTML));
+      //   // console.log(await list_page.$eval('#post-date', el => el.textContent.trim()));
+      //   // console.log(await list_page.$eval('.rich_media_meta_nickname', el => el.textContent.trim()));
+      //   // console.log(await list_page.$eval('#js_content', el => el.textContent.trim()));
+      //   // console.log(await list_page.$eval('#js_sg_bar a.meta_primary', el => el.href));
+
+      //   let sogou_uri = await list_page.url();
+      //   let biz, mid, idx, _id;
+      //   let reg_biz = /var\s*biz\s*=([^;]+)\;/;
+      //   let reg_mid = /var\s*mid\s*=([^;]+)\;/;
+      //   let reg_idx = /var\s*idx\s*=([^;]+)\;/;
+      //   let reg_sn = /var\s*sn\s*=([^;]+)\;/;
+      //   let body = await list_page.content();
+      //   let match = body.match(reg_biz);
+      //   biz = match[1].replace(/[\"\||\s]/g, '');
+      //   match = body.match(reg_mid);
+      //   mid = match[1].replace(/[\"\||\s]/g, '');
+      //   match = body.match(reg_idx);
+      //   idx = match[1].replace(/[\"\||\s]/g, '');
+      //   _id = `${biz}:${mid}:${idx}`;
+
+      //   let title = await list_page.title();
+      //   let author = await list_page.$eval('.rich_media_meta_nickname', el => el.textContent.trim());
+      //   let last_modified_at = new Date(await list_page.$eval('#post-date', el => el.textContent.trim()));
+      //   let content = await list_page.$eval('#js_content', el => el.textContent.trim());
+      //   let copyright = (await list_page.$('#copyright_logo')) ? true : false;
+
+      //   let doc = {
+      //     _id,
+      //     biz,
+      //     mid,
+      //     idx,
+      //     title,
+      //     author,
+      //     last_modified_at,
+      //     content,
+      //     copyright,
+      //     sogou_uri,
+      //     create_time: new Date(),
+      //   }
+      //   // console.log(doc);
+
+      //   let article = await Article.findByIdAndUpdate(doc._id, { $set: doc }, { upsert: true, new: true });
+      //   console.log(article);
+      //   await sleep(Math.random() * 5 + 15);
+
+      //   await list_page.goBack();
+      //   list_count = (await list_page.$$('h4')).length;
+      // }
       await list_page.close();
+      await browser.close();
       weixiner = await Weixiner.findByIdAndUpdate(weixiner._id, { $set: { sogou_status: 0 } });
     }
   } catch (error) {
