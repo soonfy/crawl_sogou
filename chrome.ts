@@ -1,7 +1,18 @@
 const puppeteer = require('puppeteer');
 import * as moment from 'moment';
 const devices = require('puppeteer/DeviceDescriptors');
-const iPhone = devices['iPhone 6'];
+// console.log(devices);
+const device_logo = []
+for (let device of devices) {
+  if (device.viewport.width >= 1024 || device.viewport.height >= 1024) {
+    device_logo.push(device);
+  }
+}
+// console.log(device_logo);
+const device_length = device_logo.length;
+// console.log(device_length);
+const device_error = ['iPad Pro landscape']
+// const iPhone = devices['iPhone 6'];
 
 import Article from './models/article';
 import ListArticle from './models/list_article';
@@ -18,6 +29,7 @@ const sleep = async (time = 10) => {
 
 const start = async () => {
   console.log('=== start ===');
+  console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
   console.log(config.dburl);
 
   const browser = await puppeteer.launch({
@@ -26,11 +38,27 @@ const start = async () => {
   });
   try {
     const page = await browser.newPage();
-    await page.goto('http://weixin.sogou.com/');
+    let no = Math.floor(Math.random() * device_length);
+    let device = device_logo[1];
+    console.log(device);
+    await page.emulate(device);
+
+    // let login_uri = 'https://account.sogou.com/web/webLogin';
+    // await page.goto(login_uri);
+    // await page.waitFor(1000);
+    // await page.waitForSelector('.username input[name=username]');
+    // await (await page.$('.username input[name=username]')).focus();
+    // await page.type('.username input[name=username]', '17710822634', { delay: 20 });
+    // await (await page.$('.password input[name=password]')).focus();
+    // await page.type('.password input[name=password]', '200912001', { delay: 20 });
+    // await page.click('#Login button', { delay: 20 });
+    // await page.waitFor(1000);
+    // console.log(await page.cookies());
+
+    let search_uri = 'http://weixin.sogou.com/'
+    await page.goto(search_uri);
     let start_time = moment();
 
-    console.log('=== next ===');
-    console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
     if (moment().subtract(10, 'seconds') < start_time) {
       await sleep(Math.random() * 10 + 20);
     } else {
@@ -52,25 +80,50 @@ const start = async () => {
       return;
     }
 
-    await page.click('.logo', { delay: 20 });
-    await page.waitForSelector('.qborder2 input[name=query]');
-    await (await page.$('.qborder2 input[name=query]')).focus();
-    await page.type('.qborder2 input[name=query]', username, { delay: 20 });
+    await page.waitFor(1000);
+    if (await page.$('.logo')) {
+      await page.click('.logo', { delay: 20 });
+    } else if (await page.$('.i_logo')) {
+      await page.click('.i_logo', { delay: 20 });
+    } else if (await page.$('h3 a[data-uigs=logo]')) {
+      await page.click('h3 a[data-uigs=logo]', { delay: 20 });
+    } else {
+      console.log(await page.content());
+      process.exit();
+    }
+
+    // await page.waitForSelector('.qborder2 input[name=query]');
+    // await (await page.$('.qborder2 input[name=query]')).focus();
+    // await page.type('.qborder2 input[name=query]', username, { delay: 20 });
+    // await page.click('.swz2', { delay: 20 });
+
+    await page.waitForSelector('#query');
+    await (await page.$('#query')).focus();
+    await page.type('#query', username, { delay: 20 });
     await page.click('.swz2', { delay: 20 });
 
     await page.waitFor(1000);
-    await page.waitForSelector('.all-time-y');
+    if(await page.$('.ip-time-p')){
+    console.log(await page.content());    
+    }
+    await page.waitForSelector('.header');
     console.log('=== search title ===');
     console.log(await page.title());
 
     console.log('=== search uri ===');
     let uri = await page.url();
     console.log(uri);
-    // console.log('=== search cookies ===');
-    // let cookies = await page.cookies(uri);
-    // console.log(cookies.length);
 
-    if ((await page.title()).trim() === '搜狗搜索' && false) {
+    console.log('=== delete search cookies ===');
+    let search_cookies = await page.cookies(search_uri);
+    for (let cookie of search_cookies) {
+      await page.deleteCookie(cookie);
+    }
+    if (search_cookies.length === 0) {
+      console.log(`=== delete search cookies over. ===`);
+    }
+
+    if ((await page.title()).trim() === '搜狗搜索') {
       // console.log('=== delete cookies ===');
       // let cookies = await page.cookies(uri);
       // for (let cookie of cookies) {
@@ -79,17 +132,10 @@ const start = async () => {
       // if (cookies.length === 0) {
       //   console.log(`=== delete cookies over. ===`);
       // }
-      // await browser.close();
-      // return;
+      await browser.close();
+      return;
     } else {
-      console.log('=== delete cookies ===');
-      let cookies = await page.cookies(uri);
-      for (let cookie of cookies) {
-        await page.deleteCookie(cookie);
-      }
-      if (cookies.length === 0) {
-        console.log(`=== delete cookies over. ===`);
-      }
+
       let usernames = await page.evaluate(() => {
         let as = [...document.querySelectorAll('div.txt-box')];
         return as.map((a) => {
@@ -124,9 +170,11 @@ const start = async () => {
 
       console.log('=== list_page title ===');
       console.log(await list_page.title());
-      console.log(await list_page.content());
 
       let list_count = (await list_page.$$('h4')).length;
+      if (list_count === 0) {
+        console.log(await list_page.content());
+      }
 
       let list_articles = await list_page.evaluate(() => {
         let as = [...document.querySelectorAll('h4')];
@@ -147,15 +195,17 @@ const start = async () => {
 
       let index = 0;
       console.log(`=== start -- all ${list_count}, now ${index} ===`);
-      console.log('=== delete cookies ===');
+
+      console.log('=== delete list cookies ===');
       let list_uri = await list_page.url();
-      let list_cookies = await list_page.cookies(list_uri);
+      let list_cookies = await page.cookies(list_uri);
       for (let cookie of list_cookies) {
-        await list_page.deleteCookie(cookie);
+        await page.deleteCookie(cookie);
       }
       if (list_cookies.length === 0) {
-        console.log(`=== delete cookies over. ===`);
+        console.log(`=== delete list cookies over. ===`);
       }
+
       // if (list_count === 0) {
       //   console.log('=== delete cookies ===');
       //   let list_uri = await list_page.url();
@@ -262,3 +312,75 @@ process.on('SIGINT', exit).on('SIGTERM', exit)
 
 floop();
 // start();
+
+const login = async () => {
+  try {
+    let uri = 'http://www.sogou.com/qq?ru=http%3A%2F%2Fwww.sogou.com%2Flogin%2Fqq_login_callback_page_new.html%3Fxy%3Dhttps%26from%3Dhttps%253A%252F%252Fwww.sogou.com%252F';
+    let sogou_uri = 'http://weixin.sogou.com/weixin?type=1&s_from=input&query=rmrbwx&ie=utf8&_sug_=n&_sug_type_='
+
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+    const page = await browser.newPage();
+    let no = Math.floor(Math.random() * device_length);
+    let device = device_logo[1];
+    console.log(device);
+    await page.emulate(device);
+
+    await page.goto(sogou_uri);
+
+    await page.waitFor(1000);
+    // console.log(await page.content());
+    // let list_uri = await list_page.url();
+    let cookies = await page.cookies(uri);
+    console.log('cookies no login');
+    console.log(cookies);
+    for (let cookie of cookies) {
+      await page.deleteCookie(cookie);
+    }
+
+    await page.goto(uri);
+
+    await page.waitFor(1000);
+    // console.log(await page.content());
+    // let list_uri = await list_page.url();
+    cookies = await page.cookies(uri);
+    console.log(cookies);
+    // for (let cookie of cookies) {
+    //   await page.deleteCookie(cookie);
+    // }
+
+    await page.waitForSelector('.username input[name=username]');
+    await (await page.$('.username input[name=username]')).focus();
+    await page.type('.username input[name=username]', '17710822634', { delay: 20 });
+    await (await page.$('.password input[name=password]')).focus();
+    await page.type('.password input[name=password]', '200912001', { delay: 20 });
+    await page.click('#Login button', { delay: 20 });
+
+    await page.waitFor(1000);
+    // console.log(await page.content());
+    // let list_uri = await list_page.url();
+    let login_cookies = await page.cookies(uri);
+    console.log(login_cookies);
+
+    await page.goto(sogou_uri);
+    // for (let cookie of cookies) {
+    //   await page.setCookie(cookie);
+    // }
+
+    await page.waitFor(1000);
+    // console.log(await page.content());
+    // let list_uri = await list_page.url();
+    cookies = await page.cookies(sogou_uri);
+    console.log('cookies login');
+    console.log(cookies);
+
+    process.exit();
+  } catch (error) {
+    console.error(error);
+    process.exit();
+  }
+}
+
+// login();
